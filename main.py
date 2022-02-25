@@ -4,6 +4,8 @@ import io as StringIO
 import PIL
 import numpy as np
 import breed
+from reader import Reader
+from segmentation import Segmenter
 
 def get_breed(breeds):
     map_characters =["Аффенпинчер", "Афганская борзая", "Африканская охотничья собака", "Эрдельтерьер", "Американский стаффордширский терьер", "Аппенцеллер зенненхунд", "Австралийский терьер", "Басенджи", "Бассет-хаунд", "Бигль", "Бедлингтон-терьер", "Бернский зенненхунд", "Чёрно-подпалый кунхаунд", "Бленхеймский спаниель", "Бладхаунд",
@@ -22,11 +24,24 @@ st.title("Моё Data science портфолио")
 st.header("Проекты:")
 st.subheader("Нейросеть, определяющая породу собаки по фото:")
 st.write('[Github проекта](https://github.com/Kostia2004/BreedsNN)')
-uploaded_file = st.file_uploader("Choose a photo")
-if uploaded_file is not None:
+uploaded_photo = st.file_uploader("Choose a photo", type=['jpg', 'png'])
+if uploaded_photo is not None:
      # To convert to a string based IO:
-     img = PIL.Image.open(uploaded_file)
+     img = PIL.Image.open(uploaded_photo)
      breeds_data = breed.resolve(img)
      st.text(get_breed(breeds_data))
      st.image(img)
 
+st.subheader("")
+st.subheader("")
+
+st.subheader("Нейросеть, сегментирующая области, пораженные COVID-19 на снимках КТ легких")
+st.write('[Github проекта](https://github.com/Kostia2004/CovidSegmentation)')
+uploaded_scan = st.file_uploader("Choose nii file", type=['nii'])
+testScanPath = 'testfiles/radiopaedia_org_covid-19-pneumonia-29_86491_1-dcm.nii'
+if uploaded_scan is None:
+    reader = Reader()
+    arr = reader.read(testScanPath)
+    segmenter = Segmenter()
+    result, lung, ct = segmenter.segmentation(arr)
+    
