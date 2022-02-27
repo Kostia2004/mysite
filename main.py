@@ -47,12 +47,13 @@ st.subheader("Нейросеть, сегментирующая области, �
 st.write('[Github проекта](https://github.com/Kostia2004/CovidSegmentation)')
 uploaded_scan = st.file_uploader("Choose nii file", type=['nii'])
 testScanPath = 'testfiles/radiopaedia_org_covid-19-pneumonia-29_86491_1-dcm.nii'
+arr = None
 if uploaded_scan is None:
     reader = Reader()
     arr = reader.read(testScanPath)
     segmenter = Segmenter()
-    result, lung, ct = segmenter.segmentation(arr)
-    alllist = [{'result': list(result)[i][...,0], 'lung': list(lung)[i][...,0], 'ct': list(ct)[i][...,0]} for i in range(arr.shape[2])]
-    print(len(alllist))
-    figlist = list(map(matrixToMpl, alllist))
-    st.pyplot(figlist[0])
+result, lung, ct = segmenter.segmentation(arr)
+alllist = [{'result': list(result)[i][...,0], 'lung': list(lung)[i][...,0], 'ct': list(ct)[i][...,0]} for i in range(arr.shape[2])]
+figlist = list(map(matrixToMpl, alllist))
+slicenum = st.slider("Number of slice", 1, len(alllist))
+st.pyplot(figlist[slicenum])
