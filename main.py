@@ -23,7 +23,7 @@ def matrixToMpl(dct):
 
     plt.subplot(133)
     plt.imshow(ct, cmap = 'bone')
-    plt.imshow(res, alpha=0.7, cmap = 'bone')
+    plt.imshow(res, alpha=0.5, cmap = 'nipy_spectral')
     plt.title('predicted infection mask')
 
     return fig
@@ -46,8 +46,8 @@ st.subheader("Нейросеть, сегментирующая области, �
 st.write('[Github проекта](https://github.com/Kostia2004/CovidSegmentation)')
 scan_choice = st.radio("Select scan for predict", ("Upload", "First test", "Second test", "Third test"))
 
-print(st.session_state)
-
+if 'scan_choice' not in list(st.session_state.keys()):
+    st.session_state.scan_choice = None
 if scan_choice=="Upload":
     uploaded_scan = st.file_uploader("Choose nii file", type=['nii'])
 
@@ -56,6 +56,7 @@ test2 = 'testfiles/radiopaedia_org_covid-19-pneumonia-29_86491_1-dcm.nii'
 test3 = 'testfiles/radiopaedia_org_covid-19-pneumonia-4_85506_1-dcm.nii'
 
 if scan_choice!="Upload":
+    print(scan_choice, st.session_state.scan_choice)
     reader = Reader()
     testScanPath = ""
     match scan_choice:
@@ -68,11 +69,12 @@ if scan_choice!="Upload":
 
     arr = reader.read(testScanPath)
     segmenter = Segmenter()
-    if ('result' not in st.session_state) and ('lung' not in st.session_state) and ('ct' not in st.session_state):
+    if (('result' not in st.session_state) and ('lung' not in st.session_state) and ('ct' not in st.session_state)) or scan_choice!=st.session_state.scan_choice:
         st.session_state.result, st.session_state.lung, st.session_state.ct = segmenter.segmentation(arr)
-    if 'alllist' not in st.session_state:
+    if 'alllist' not in st.session_state or scan_choice!=st.session_state.scan_choice:
         st.session_state.alllist = [{'result': list(st.session_state.result)[i][...,0], 'lung': list(st.session_state.lung)[i][...,0], 'ct': list(st.session_state.ct)[i][...,0]} for i in range(arr.shape[2])]
-    if 'figlist' not in st.session_state:
+    if 'figlist' not in st.session_state or scan_choice!=st.session_state.scan_choice:
         st.session_state.figlist = list(map(matrixToMpl, st.session_state.alllist))
     slicenum = st.slider("Number of slice", 1, len(st.session_state.alllist))
-    st.pyplot(st.session_state.figlist[slicenum])
+    st.pyplot(st.session_state.figlist[slicenum-1])
+    st.session_state.scan_choice = scan_choice
