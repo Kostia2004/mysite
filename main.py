@@ -46,10 +46,16 @@ st.subheader("Нейросеть, сегментирующая области, �
 st.write('[Github проекта](https://github.com/Kostia2004/CovidSegmentation)')
 scan_choice = st.radio("Select scan for predict", ("Upload", "First test", "Second test", "Third test"))
 
+arr = None
+
 if 'scan_choice' not in list(st.session_state.keys()):
     st.session_state.scan_choice = None
 if scan_choice=="Upload":
     uploaded_scan = st.file_uploader("Choose nii file", type=['nii'])
+    if uploaded_scan is not None:
+        bytestr = uploaded_scan.getvalue()
+        reader = Reader()
+        arr = reader.read_bytes(bytestr)
 
 test1 = 'testfiles/radiopaedia_org_covid-19-pneumonia-10_85902_1-dcm.nii'
 test2 = 'testfiles/radiopaedia_org_covid-19-pneumonia-29_86491_1-dcm.nii'
@@ -68,6 +74,8 @@ if scan_choice!="Upload":
             testScanPath = test3
 
     arr = reader.read(testScanPath)
+
+if arr is not None:
     segmenter = Segmenter()
     if (('result' not in st.session_state) and ('lung' not in st.session_state) and ('ct' not in st.session_state)) or scan_choice!=st.session_state.scan_choice:
         st.session_state.result, st.session_state.lung, st.session_state.ct = segmenter.segmentation(arr)

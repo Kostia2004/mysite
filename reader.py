@@ -30,6 +30,12 @@ class Reader():
         os.remove(path[:-3]+'.nii')
         return array
 
+    def read_bytes(self, bytestr):
+        ct_scan = nib.Nifti1Image.from_bytes(bytestr)
+        array   = ct_scan.get_fdata()
+        array   = np.rot90(np.array(array))
+        return array
+
     def read(self, path):
         if path.endswith('nii'):
             return self.read_nii(path)
