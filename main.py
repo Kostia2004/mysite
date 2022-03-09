@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import io
 import PIL
 import numpy as np
@@ -78,6 +77,7 @@ if scan_choice!="Upload":
 if arr is not None:
     segmenter = Segmenter()
     if (('result' not in st.session_state) and ('lung' not in st.session_state) and ('ct' not in st.session_state)) or scan_choice!=st.session_state.scan_choice:
+        print(scan_choice, st.session_state.scan_choice)
         st.session_state.result, st.session_state.lung, st.session_state.ct = segmenter.segmentation(arr)
     if 'alllist' not in st.session_state or scan_choice!=st.session_state.scan_choice:
         st.session_state.alllist = [{'result': list(st.session_state.result)[i][...,0], 'lung': list(st.session_state.lung)[i][...,0], 'ct': list(st.session_state.ct)[i][...,0]} for i in range(arr.shape[2])]
