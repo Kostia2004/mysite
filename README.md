@@ -6,4 +6,5 @@ All written in Python using the `streamlit` module
 ## start:
 
 docker build -t my-streamlit-portfolio:latest .
+
 docker run -p 8501:8501 my-streamlit-portfolio:latest
